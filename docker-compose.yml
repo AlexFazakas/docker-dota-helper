@@ -1,10 +1,24 @@
-version: "3.1"
+version: "2"
 services:
-    backend:
-        build: ./backend
-        ports:
-            - "5000:5000"
-    client:
-        build: ./client
-        links: 
-            - backend
+  backend:
+    build: ./backend
+    links:
+      - db
+    ports:
+      - "5000:5000"
+  
+  client:
+    build: ./client
+    tty: true
+    stdin_open: true
+    links:
+      - backend
+
+  db:
+    image: mysql:5.7
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: "root"
+    volumes:
+      - ./db:/docker-entrypoint-initdb.d/:ro
