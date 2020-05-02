@@ -31,6 +31,22 @@ create table heroes (
   primary key (id)
 );
 
+create table hero_stats (
+  id int,
+  attack_range int,
+  base_agi int,
+  base_armor int,
+  base_health int,
+  base_int int,
+  base_mana int,
+  base_mana_regen int,
+  base_str int,
+  int_gain float,
+  agi_gain float,
+  str_gain float,
+  primary key (id)
+);
+
 create trigger primary_attribute_frequency
 before insert on heroes
 for each row
@@ -167,21 +183,6 @@ insert into heroes values (126, 'Void Spirit', 'int', 'Melee');
 insert into heroes values (128, 'Snapfire', 'str', 'Ranged');
 insert into heroes values (129, 'Mars', 'str', 'Melee');
 
-create table hero_stats (
-  id int,
-  attack_range int,
-  base_agi int,
-  base_armor int,
-  base_health int,
-  base_int int,
-  base_mana int,
-  base_mana_regen int,
-  base_str int,
-  int_gain float,
-  agi_gain float,
-  str_gain float,
-  primary key (id)
-);
 
 insert into hero_stats values (1, 150, 24, -1, 200, 12, 75, 0, 23, 1.8, 3, 1.3);
 insert into hero_stats values (2, 150, 20, -1, 200, 18, 75, 0, 25, 1.6, 2.2, 3.4);
@@ -304,65 +305,65 @@ insert into hero_stats values (128, 500, 16, 1, 200, 18, 75, 0, 20, 2.2, 1.9, 3.
 insert into hero_stats values (129, 250, 20, -1, 200, 17, 75, 0, 23, 1.4, 1.9, 3.2);
 
 
--- create procedure get_hero_stats(IN hero varchar(50))
--- begin
---   select
---     a.name,
---     a.attack_type,
---     a.primary_attribute,
---     b.attack_range,
---     b.base_agi,
---     b.base_armor,
---     b.base_health,
---     b.base_mana,
---     b.base_mana_regen,
---     b.base_str,
---     b.int_gain,
---     b.agi_gain,
---     b.str_gain
---   from
---     heroes a,
---     hero_stats b
---   where
---     (a.id = hero and b.id = hero) or (lower(hero) = lower(a.name) and a.id = b.id);
--- end //
--- DELIMITER ;
+create procedure get_hero_stats(IN hero varchar(50))
+begin
+  select
+    a.name,
+    a.attack_type,
+    a.primary_attribute,
+    b.attack_range,
+    b.base_agi,
+    b.base_armor,
+    b.base_health,
+    b.base_mana,
+    b.base_mana_regen,
+    b.base_str,
+    b.int_gain,
+    b.agi_gain,
+    b.str_gain
+  from
+    heroes a,
+    hero_stats b
+  where
+    (a.id = hero and b.id = hero) or (lower(hero) = lower(a.name) and a.id = b.id);
+end //
+DELIMITER ;
 
--- DELIMITER //
--- create function compute_winrate(hero varchar(50))
---   returns float
--- begin
---   declare total_wins int;
---   declare total_games int;
---   select
---     sum(wins)
---   into
---     total_wins
---   from
---     heroes a, matchups b
---   where
---     (a.id = hero and b.id = hero) or (lower(hero) = lower(a.name) and a.id = b.id);
---   select
---     sum(games)
---   into
---     total_games
---   from
---     heroes a, matchups b
---   where
---     (a.id = hero and b.id = hero) or (lower(hero) = lower(a.name) and a.id = b.id);
---   return (total_wins / total_games);
--- end;
--- //
--- DELIMITER ;
+DELIMITER //
+create function compute_winrate(hero varchar(50))
+  returns float
+begin
+  declare total_wins int;
+  declare total_games int;
+  select
+    sum(wins)
+  into
+    total_wins
+  from
+    heroes a, matchups b
+  where
+    (a.id = hero and b.id = hero) or (lower(hero) = lower(a.name) and a.id = b.id);
+  select
+    sum(games)
+  into
+    total_games
+  from
+    heroes a, matchups b
+  where
+    (a.id = hero and b.id = hero) or (lower(hero) = lower(a.name) and a.id = b.id);
+  return (total_wins / total_games);
+end;
+//
+DELIMITER ;
 
--- DELIMITER //
--- create procedure get_heroes_by_winrate()
--- begin
---   select
---     name, compute_winrate(id) as winrate
---   from
---     heroes
---   order by winrate desc
---   limit 10;
--- end //
--- DELIMITER ;
+DELIMITER //
+create procedure get_heroes_by_winrate()
+begin
+  select
+    name, compute_winrate(id) as winrate
+  from
+    heroes
+  order by winrate desc
+  limit 10;
+end //
+DELIMITER ;

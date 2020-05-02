@@ -13,6 +13,13 @@ services:
     stdin_open: true
     links:
       - backend
+  
+  admin-app:
+    build: ./admin_app
+    links:
+      - db
+    tty: true
+    stdin_open: true
 
   db:
     image: mysql:5.7
