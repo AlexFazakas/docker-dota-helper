@@ -2,27 +2,6 @@ create database dota;
 
 use dota;
 
-DELIMITER //
-
-create table primary_attribute_count (
-  attribute varchar(50),
-  occurences int,
-  primary key (attribute)
-);
-
-insert into primary_attribute_count values('agi', 0);
-insert into primary_attribute_count values('int', 0);
-insert into primary_attribute_count values('str', 0);
-
-create table attack_type_count (
-  attack_type varchar(50),
-  occurences int,
-  primary key(attack_type)
-);
-
-insert into attack_type_count values('Melee', 0);
-insert into attack_type_count values('Ranged', 0);
-
 create table heroes (
   id int,
   name varchar(50),
@@ -47,21 +26,13 @@ create table hero_stats (
   primary key (id)
 );
 
-create trigger primary_attribute_frequency
-before insert on heroes
-for each row
-begin
-  update primary_attribute_count set occurences = occurences + 1
-    where attribute = NEW.primary_attribute;
-end;
-
-create trigger attack_type_frequency
-before insert on heroes
-for each row
-begin
-  update attack_type_count set occurences = occurences + 1
-    where attack_type = NEW.attack_type;
-end;
+create table hero_record (
+  id int,
+  name varchar(50),
+  wins int,
+  losses int,
+  primary key(id)
+);
 
 insert into heroes values (1, 'Anti-Mage', 'agi', 'Melee');
 insert into heroes values (2, 'Axe', 'str', 'Melee');
@@ -304,66 +275,122 @@ insert into hero_stats values (126, 200, 19, -1, 200, 24, 75, 0.6, 22, 3.1, 2.2,
 insert into hero_stats values (128, 500, 16, 1, 200, 18, 75, 0, 20, 2.2, 1.9, 3.3);
 insert into hero_stats values (129, 250, 20, -1, 200, 17, 75, 0, 23, 1.4, 1.9, 3.2);
 
-
-create procedure get_hero_stats(IN hero varchar(50))
-begin
-  select
-    a.name,
-    a.attack_type,
-    a.primary_attribute,
-    b.attack_range,
-    b.base_agi,
-    b.base_armor,
-    b.base_health,
-    b.base_mana,
-    b.base_mana_regen,
-    b.base_str,
-    b.int_gain,
-    b.agi_gain,
-    b.str_gain
-  from
-    heroes a,
-    hero_stats b
-  where
-    (a.id = hero and b.id = hero) or (lower(hero) = lower(a.name) and a.id = b.id);
-end //
-DELIMITER ;
-
-DELIMITER //
-create function compute_winrate(hero varchar(50))
-  returns float
-begin
-  declare total_wins int;
-  declare total_games int;
-  select
-    sum(wins)
-  into
-    total_wins
-  from
-    heroes a, matchups b
-  where
-    (a.id = hero and b.id = hero) or (lower(hero) = lower(a.name) and a.id = b.id);
-  select
-    sum(games)
-  into
-    total_games
-  from
-    heroes a, matchups b
-  where
-    (a.id = hero and b.id = hero) or (lower(hero) = lower(a.name) and a.id = b.id);
-  return (total_wins / total_games);
-end;
-//
-DELIMITER ;
-
-DELIMITER //
-create procedure get_heroes_by_winrate()
-begin
-  select
-    name, compute_winrate(id) as winrate
-  from
-    heroes
-  order by winrate desc
-  limit 10;
-end //
-DELIMITER ;
+insert into hero_record values (1, 'Anti-Mage', 0, 0);
+insert into hero_record values (2, 'Axe', 0, 0);
+insert into hero_record values (3, 'Bane', 0, 0);
+insert into hero_record values (4, 'Bloodseeker', 0, 0);
+insert into hero_record values (5, 'Crystal Maiden', 0, 0);
+insert into hero_record values (6, 'Drow Ranger', 0, 0);
+insert into hero_record values (7, 'Earthshaker', 0, 0);
+insert into hero_record values (8, 'Juggernaut', 0, 0);
+insert into hero_record values (9, 'Mirana', 0, 0);
+insert into hero_record values (10, 'Morphling', 0, 0);
+insert into hero_record values (11, 'Shadow Fiend', 0, 0);
+insert into hero_record values (12, 'Phantom Lancer', 0, 0);
+insert into hero_record values (13, 'Puck', 0, 0);
+insert into hero_record values (14, 'Pudge', 0, 0);
+insert into hero_record values (15, 'Razor', 0, 0);
+insert into hero_record values (16, 'Sand King', 0, 0);
+insert into hero_record values (17, 'Storm Spirit', 0, 0);
+insert into hero_record values (18, 'Sven', 0, 0);
+insert into hero_record values (19, 'Tiny', 0, 0);
+insert into hero_record values (20, 'Vengeful Spirit', 0, 0);
+insert into hero_record values (21, 'Windranger', 0, 0);
+insert into hero_record values (22, 'Zeus', 0, 0);
+insert into hero_record values (23, 'Kunkka', 0, 0);
+insert into hero_record values (25, 'Lina', 0, 0);
+insert into hero_record values (26, 'Lion', 0, 0);
+insert into hero_record values (27, 'Shadow Shaman', 0, 0);
+insert into hero_record values (28, 'Slardar', 0, 0);
+insert into hero_record values (29, 'Tidehunter', 0, 0);
+insert into hero_record values (30, 'Witch Doctor', 0, 0);
+insert into hero_record values (31, 'Lich', 0, 0);
+insert into hero_record values (32, 'Riki', 0, 0);
+insert into hero_record values (33, 'Enigma', 0, 0);
+insert into hero_record values (34, 'Tinker', 0, 0);
+insert into hero_record values (35, 'Sniper', 0, 0);
+insert into hero_record values (36, 'Necrophos', 0, 0);
+insert into hero_record values (37, 'Warlock', 0, 0);
+insert into hero_record values (38, 'Beastmaster', 0, 0);
+insert into hero_record values (39, 'Queen of Pain', 0, 0);
+insert into hero_record values (40, 'Venomancer', 0, 0);
+insert into hero_record values (41, 'Faceless Void', 0, 0);
+insert into hero_record values (42, 'Wraith King', 0, 0);
+insert into hero_record values (43, 'Death Prophet', 0, 0);
+insert into hero_record values (44, 'Phantom Assassin', 0, 0);
+insert into hero_record values (45, 'Pugna', 0, 0);
+insert into hero_record values (46, 'Templar Assassin', 0, 0);
+insert into hero_record values (47, 'Viper', 0, 0);
+insert into hero_record values (48, 'Luna', 0, 0);
+insert into hero_record values (49, 'Dragon Knight', 0, 0);
+insert into hero_record values (50, 'Dazzle', 0, 0);
+insert into hero_record values (51, 'Clockwerk', 0, 0);
+insert into hero_record values (52, 'Leshrac', 0, 0);
+insert into hero_record values (53, 'Nature''s Prophet', 0, 0);
+insert into hero_record values (54, 'Lifestealer', 0, 0);
+insert into hero_record values (55, 'Dark Seer', 0, 0);
+insert into hero_record values (56, 'Clinkz', 0, 0);
+insert into hero_record values (57, 'Omniknight', 0, 0);
+insert into hero_record values (58, 'Enchantress', 0, 0);
+insert into hero_record values (59, 'Huskar', 0, 0);
+insert into hero_record values (60, 'Night Stalker', 0, 0);
+insert into hero_record values (61, 'Broodmother', 0, 0);
+insert into hero_record values (62, 'Bounty Hunter', 0, 0);
+insert into hero_record values (63, 'Weaver', 0, 0);
+insert into hero_record values (64, 'Jakiro', 0, 0);
+insert into hero_record values (65, 'Batrider', 0, 0);
+insert into hero_record values (66, 'Chen', 0, 0);
+insert into hero_record values (67, 'Spectre', 0, 0);
+insert into hero_record values (68, 'Ancient Apparition', 0, 0);
+insert into hero_record values (69, 'Doom', 0, 0);
+insert into hero_record values (70, 'Ursa', 0, 0);
+insert into hero_record values (71, 'Spirit Breaker', 0, 0);
+insert into hero_record values (72, 'Gyrocopter', 0, 0);
+insert into hero_record values (73, 'Alchemist', 0, 0);
+insert into hero_record values (74, 'Invoker', 0, 0);
+insert into hero_record values (75, 'Silencer', 0, 0);
+insert into hero_record values (76, 'Outworld Devourer', 0, 0);
+insert into hero_record values (77, 'Lycan', 0, 0);
+insert into hero_record values (78, 'Brewmaster', 0, 0);
+insert into hero_record values (79, 'Shadow Demon', 0, 0);
+insert into hero_record values (80, 'Lone Druid', 0, 0);
+insert into hero_record values (81, 'Chaos Knight', 0, 0);
+insert into hero_record values (82, 'Meepo', 0, 0);
+insert into hero_record values (83, 'Treant Protector', 0, 0);
+insert into hero_record values (84, 'Ogre Magi', 0, 0);
+insert into hero_record values (85, 'Undying', 0, 0);
+insert into hero_record values (86, 'Rubick', 0, 0);
+insert into hero_record values (87, 'Disruptor', 0, 0);
+insert into hero_record values (88, 'Nyx Assassin', 0, 0);
+insert into hero_record values (89, 'Naga Siren', 0, 0);
+insert into hero_record values (90, 'Keeper of the Light', 0, 0);
+insert into hero_record values (91, 'Io', 0, 0);
+insert into hero_record values (92, 'Visage', 0, 0);
+insert into hero_record values (93, 'Slark', 0, 0);
+insert into hero_record values (94, 'Medusa', 0, 0);
+insert into hero_record values (95, 'Troll Warlord', 0, 0);
+insert into hero_record values (96, 'Centaur Warrunner', 0, 0);
+insert into hero_record values (97, 'Magnus', 0, 0);
+insert into hero_record values (98, 'Timbersaw', 0, 0);
+insert into hero_record values (99, 'Bristleback', 0, 0);
+insert into hero_record values (100, 'Tusk', 0, 0);
+insert into hero_record values (101, 'Skywrath Mage', 0, 0);
+insert into hero_record values (102, 'Abaddon', 0, 0);
+insert into hero_record values (103, 'Elder Titan', 0, 0);
+insert into hero_record values (104, 'Legion Commander', 0, 0);
+insert into hero_record values (105, 'Techies', 0, 0);
+insert into hero_record values (106, 'Ember Spirit', 0, 0);
+insert into hero_record values (107, 'Earth Spirit', 0, 0);
+insert into hero_record values (108, 'Underlord', 0, 0);
+insert into hero_record values (109, 'Terrorblade', 0, 0);
+insert into hero_record values (110, 'Phoenix', 0, 0);
+insert into hero_record values (111, 'Oracle', 0, 0);
+insert into hero_record values (112, 'Winter Wyvern', 0, 0);
+insert into hero_record values (113, 'Arc Warden', 0, 0);
+insert into hero_record values (114, 'Monkey King', 0, 0);
+insert into hero_record values (119, 'Dark Willow', 0, 0);
+insert into hero_record values (120, 'Pangolier', 0, 0);
+insert into hero_record values (121, 'Grimstroke', 0, 0);
+insert into hero_record values (126, 'Void Spirit', 0, 0);
+insert into hero_record values (128, 'Snapfire', 0, 0);
+insert into hero_record values (129, 'Mars', 0, 0);

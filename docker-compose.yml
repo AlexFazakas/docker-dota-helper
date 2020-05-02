@@ -11,15 +11,11 @@ services:
     build: ./client
     tty: true
     stdin_open: true
-    links:
-      - backend
   
-  admin-app:
-    build: ./admin_app
-    links:
-      - db
-    tty: true
-    stdin_open: true
+  matchups:
+    build: ./matchups
+    ports:
+      - "5001:5001"
 
   db:
     image: mysql:5.7

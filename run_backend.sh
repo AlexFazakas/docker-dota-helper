@@ -1,4 +1,4 @@
 #!/bin/bash
 
 docker-compose build
-docker-compose run backend --service-ports --name=backend
+docker-compose run --service-ports --name=backend backend

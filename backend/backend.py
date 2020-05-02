@@ -65,5 +65,64 @@ def hero_stats() -> str:
     }
     return json.dumps(res)
 
+@app.route('/hero-winrate/', methods=['POST'])
+def hero_winrate() -> str:
+    global connection
+
+    if not connection:
+        initialiaze_db_connection()
+    data = parse_qs(request.get_data().decode('utf-8'))
+    cursor = connection.cursor(buffered=True)
+    hero = data['hero'][0]
+    cursor.execute('select * from hero_record where id = \'{}\' or lower(name) = \'{}\''.format(
+        hero, str(hero).lower())
+    )
+    stats = [x for x in cursor]
+    if not stats:
+        return 'Could not find the hero. :('
+    else:
+        stats = stats[0]
+    wins = stats[2]
+    losses = stats[3]
+    win_rate = 0
+    if losses == 0:
+        win_rate = 100
+    else:
+        win_rate = round(wins / (wins + losses) * 100, 2)
+    res = {
+        'Wins': str(wins),
+        'Losses': str(losses),
+        'Winrate': str(win_rate) + '%'
+    }
+    return json.dumps(res)
+
+@app.route('/match-result/', methods=['POST'])
+def update_record() -> str:
+    global connection
+
+    if not connection:
+        initialiaze_db_connection()
+    data = parse_qs(request.get_data().decode('utf-8'))
+    cursor = connection.cursor(buffered=True)
+    hero = data['hero'][0]
+    cursor.execute('select * from heroes where id = \'{}\' or lower(name) = \'{}\''.format(
+        hero, str(hero).lower())
+    )
+    stats = [x for x in cursor]
+    if not stats:
+        return 'Could not find the hero. :('
+    else:
+        stats = stats[0]
+    hero_id = stats[0]
+    hero_name = stats[1]
+    win_loss = data['result'][0]
+    column = 'wins'
+    if win_loss in ['l', 'loss']:
+        column = 'losses'
+    cursor.execute('update hero_record set {} = {} + 1 where id = \'{}\''.format(
+        column, column, hero_id
+    ))
+    return json.dumps({'Result': 'updated the record for {}'.format(hero_name)})
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)
