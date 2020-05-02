@@ -20,12 +20,29 @@ def get_hero_name(hero_id):
         heroes = json.loads(requests.get(API.format('heroes')).text)
         for hero in heroes:
             ids_to_names[hero['id']] = hero['localized_name']
-    return ids_to_names[hero_id]
+    return ids_to_names[hero_id] if hero_id in ids_to_names else None
+
+def get_id_for_hero_name(hero_name):
+    if len(ids_to_names) == 0:
+        heroes = json.loads(requests.get(API.format('heroes')).text)
+        for hero in heroes:
+            ids_to_names[hero['id']] = hero['localized_name']
+    if hero_name in ids_to_names.values():
+        for id in ids_to_names:
+            if ids_to_names[id].lower() == hero_name.lower():
+                return id
+    return None
 
 @app.route('/get-matchups/', methods=['POST'])
 def update_record() -> str:
     data = parse_qs(request.get_data().decode('utf-8'))
     hero = data['hero'][0]
+    try:
+        num = int(hero)
+    except:
+        hero = get_id_for_hero_name(hero)
+        if not hero:
+            return 'Could not find the hero. :('
     best_worst = data['best'][0]
     matchups = json.loads(requests.get(API.format('heroes') + str(hero) + '/matchups').text)
     if not matchups:

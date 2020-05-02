@@ -6,7 +6,7 @@ from copy import deepcopy
 import mysql.connector
 import json
 import uuid
-
+from prometheus_flask_exporter import PrometheusMetrics
 
 ID=0
 SOURCE=1
@@ -17,7 +17,10 @@ DURATION=5
 CAPACITY=6
 
 app = Flask(__name__)
+metrics = PrometheusMetrics(app)
 connection = None
+
+metrics.info('backend', 'Backend prometheus metrics', version='1.0.3')
 
 def initialiaze_db_connection():
     global connection

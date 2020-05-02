@@ -29,8 +29,8 @@ def stringify_matchups(result, matchups='Best matchups') -> str:
     return res
 
 def main():
-    API = sys.argv[1] + '{}'
-    API_2 = sys.argv[2] + '{}'
+    API = 'http://backend:5000/{}'
+    API_2 = 'http://matchups:5001/{}'
     while True:
         print("Choose an option:")
         print("[1]: Get hero stats")

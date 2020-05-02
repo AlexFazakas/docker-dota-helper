@@ -1,4 +1,6 @@
-version: "2"
+version: "3.3"
+volumes:
+  prometheus_volume: {}
 services:
   backend:
     build: ./backend
@@ -6,6 +8,7 @@ services:
       - db
     ports:
       - "5000:5000"
+    hostname: backend
   
   client:
     build: ./client
@@ -16,6 +19,7 @@ services:
     build: ./matchups
     ports:
       - "5001:5001"
+    hostname: matchups
 
   db:
     image: mysql:5.7
@@ -25,3 +29,12 @@ services:
       MYSQL_ROOT_PASSWORD: "root"
     volumes:
       - ./db:/docker-entrypoint-initdb.d/:ro
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus/:/etc/prometheus/
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    ports:
+      - "9090:9090"
